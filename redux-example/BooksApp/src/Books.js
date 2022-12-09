@@ -8,8 +8,7 @@ import {
     TouchableOpacity
 } from "react-native";
 
-import { connect } from "react-redux";
-import { addBook } from "./actions";
+import { addBook } from "./bookSlice";
 
 const initialState = {
     name: "",
@@ -26,13 +25,13 @@ class Books extends Component {
         })
     };
 
-    addBook = () => {
-        this.props.dispatchAddBook(this.state),
+    addBookToStore = () => {
+        this.props.store.dispatch(addBook(this.state));
         this.setState(initialState);
     };
 
     render() {
-        const { books } = this.props;
+        const { books } = this.props.store.getState();
 
         return (
             <View style={styles.container}>
@@ -44,8 +43,8 @@ class Books extends Component {
                     {
                         books.map((book, index) => (
                             <View style={styles.book} key={index}>
-                                <Text style={styles.name}>{book.name}</Text>
-                                <Text style={styles.author}>{book.author}</Text>
+                                <Text style={styles.name}>{book.payload.name}</Text>
+                                <Text style={styles.author}>{book.payload.author}</Text>
                             </View>
                         ))
                     }
@@ -65,7 +64,7 @@ class Books extends Component {
                             placeholderTextColor={"grey"}
                             onChangeText={(value) => this.updateInput("author", value)}/>
                         </View>
-                        <TouchableOpacity onPress={this.addBook}>
+                        <TouchableOpacity onPress={this.addBookToStore}>
                             <View style={styles.addButtonContainer}>
                                 <Text style={styles.addButton}>+</Text>
                             </View>
@@ -139,12 +138,4 @@ const styles = StyleSheet.create({
     }
 });
 
-const mapStateToProps = (state) => ({
-    books: state.bookReducer.books
-});
-
-const mapDispatchToProps = {
-    dispatchAddBook: (book) => addBook(book),
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Books);
+export default Books;
